@@ -6,14 +6,25 @@ import User from "../models/User.js"
 //API Controlled function to manage clerk user with database
 
 export const clerkWebhooks = async (req, res) => {
+  
   try {
-    
-    const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
-    await whook.verify(JSON.stringify(req.body), {
-      "svix-id": req.headers["svix-id"],
-      "svix-timestamp": req.headers["svix-timestamp"],
-      "svix-signature": req.headers["svix-signature"]
-    })
+    console.log("testing yash",process.env.CLERK_WEBHOOK_SECRET)
+    const key = process.env.CLERK_WEBHOOK_SECRET;
+    // const whook = new Webhook(key);
+    // console.log("testing",CLERK_WEBHOOK_SECRET)
+    // await whook.verify(JSON.stringify(req.body), {
+    //   "svix-id": req.headers["svix-id"],
+    //   "svix-timestamp": req.headers["svix-timestamp"],
+    //   "svix-signature": req.headers["svix-signature"]
+    // })
+    const whook = new Webhook(key);
+
+await whook.verify(req.body, {
+  "svix-id": req.headers["svix-id"],
+  "svix-timestamp": req.headers["svix-timestamp"],
+  "svix-signature": req.headers["svix-signature"]
+});
+
      console.log("🔔 Webhook received:", req.body);
     const { data, type } = req.body;
     switch (type) {
@@ -50,6 +61,7 @@ export const clerkWebhooks = async (req, res) => {
         break;
     }
   } catch (error) {
+    console.log("testing error",error)
     res.json({success: false, message:error.message})
   }
 };

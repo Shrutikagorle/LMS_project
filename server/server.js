@@ -1,27 +1,35 @@
-import express from 'express'
-import cors from 'cors'
-import 'dotenv/config'
-import connectDB from './configs/mongodb.js'
-import { clerkWebhooks } from './controllers/webhooks.js'
+// server.js
 
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import connectDB from './configs/mongodb.js';
+import { clerkWebhooks } from './controllers/webhooks.js';
 
-//initilize express app
+dotenv.config();
 
-const app= express()
+const app = express();
 
-//conneect to database
+// 🛠 Connect to MongoDB
+await connectDB();
 
-await connectDB()
+// 🌐 Global Middleware
+app.use(cors());
 
-//miiddleware
-app.use(cors())
+// 🔔 Webhook Route — must use raw body for Svix signature verification
+const rawJson = express.raw({ type: 'application/json' });
+app.post('/clerk', rawJson, clerkWebhooks);
 
-//Route
-app.get('/', (req, res)=> res.send("Api working"))
-app.post('/clerk', express.json(), clerkWebhooks) //request will ne parded using this json method 
+// 🏠 Health Check Endpoint
+app.get('/', (req, res) => res.send("API working"));
 
-//port 
-const PORT= process.env.PORT || 5000
-app.listen(PORT, ()=>{
-    console.log(`server is running on ${PORT}`)
-})
+// ⚠️ Catch-All for Undefined Routes
+app.use((req, res) => {
+  res.status(404).send("Route not found");
+});
+
+// 🚀 Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server is running on port ${PORT}`);
+});
