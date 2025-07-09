@@ -3,7 +3,7 @@ import User from "../models/User.js"
 
 
 
-//API Controilled function to manage clerk user with database
+//API Controlled function to manage clerk user with database
 
 export const clerkWebhooks = async (req, res) => {
   try {
@@ -24,7 +24,7 @@ export const clerkWebhooks = async (req, res) => {
           name: data.first_name + " " + data.last_name,
           imageUrl: data.image_url,
         };
-        await User.create(userData);
+        await User.create(userData); // this stores the data on mongodb database
         res.json({});
         break;
       }
